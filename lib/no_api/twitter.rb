@@ -47,6 +47,17 @@ module NoApi
       @fullname ||= extract_fullname(user_page)
     end
 
+    def location
+      @location ||= extract_location(user_page)
+    end
+
+    # TODO: 鍵付き判定
+    def tweets
+      @tweets ||= extract_tweets(user_page)
+    end
+
+#    private
+
     def user_page
       return @user_page unless @user_page.nil?
 
@@ -59,7 +70,6 @@ module NoApi
       @agent ||= Mechanize.new
     end
 
-    private
     # These functions have to be updated constantly
     def extract_bio(page)
       page.css('.bio').first.children[1].children.first.text.strip
@@ -69,12 +79,22 @@ module NoApi
       page.css('.url').first.children[1].children[1].children.first.text.strip
     end
 
+    def extract_tweets(page)
+      page.css('.tweet-text').inject([]){|arr, tweet_tag|
+        arr << tweet_tag.children[1].children.first.text.strip
+      }
+    end
+
     def extract_avatar_url(page)
       page.css('.avatar').first.children[1].attributes['src'].value.strip.gsub(/_normal/,'')
     end
 
     def extract_fullname(page)
       page.css('.fullname').first.children.first.text.strip
+    end
+
+    def extract_location(page)
+      page.css('.location').first.children.first.text.strip
     end
 
     def extract_profile_stats(page)
